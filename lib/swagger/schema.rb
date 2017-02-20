@@ -38,6 +38,16 @@ module Swagger
     end
 
     def resolve_refs
+      if key?('allOf')
+        allof = delete('allOf')
+        allof.each do |it|
+          if it.is_a?(Swagger::Schema)
+            it.attach_parent(self)
+            it.resolve_refs
+          end
+          self.merge!(it)
+        end
+      end
       children.each do |child|
         child.resolve_refs if child.is_a?(Swagger::Schema)
       end
